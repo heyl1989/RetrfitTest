@@ -1,8 +1,8 @@
 package retrfit_test.cn.v1.retrfittest;
 
+import com.google.gson.Gson;
 import java.io.IOException;
 import java.util.List;
-
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
@@ -37,17 +37,10 @@ public class RetrfitTest {
         Call<List<Contributor>> call = github.contributors("square", "retrofit");
         //获取并打印库的贡献者列表。
         Response response = call.execute();
-        List<Contributor> contributors = (List<Contributor>) response.body();
         System.out.println(response.code() + "\n"
                 + response.toString() + "\n"
-                + response.body().toString());
-        for (Contributor contributor : contributors) {
-            System.out.println(contributor.login + " (" + contributor.contributions + ")");
-        }
+                + new Gson().toJson(response.body()));
     }
-
-    //https://api.github.com/repos/square/retrofit/contributors
-    public static final String API_URL = "https://api.github.com";
 
     public static class Contributor {
         public final String login;
@@ -59,6 +52,8 @@ public class RetrfitTest {
         }
     }
 
+    //https://api.github.com/repos/square/retrofit/contributors
+    public static final String API_URL = "https://api.github.com";
     public interface GitHub {
         @GET("/repos/{owner}/{repo}/contributors")
         Call<List<Contributor>> contributors(
