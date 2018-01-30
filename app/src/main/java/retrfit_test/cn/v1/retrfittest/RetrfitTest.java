@@ -3,6 +3,10 @@ package retrfit_test.cn.v1.retrfittest;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
@@ -17,6 +21,8 @@ import retrofit2.http.Path;
 
 public class RetrfitTest {
 
+    private static final long TIMEOUT = 30;
+
     public static void main(String[] args) {
         try {
             retrfitTest();
@@ -29,6 +35,7 @@ public class RetrfitTest {
         //创建一个非常简单的指向GitHub API的REST适配器。
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(API_URL)
+                .client(httpClient)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         //创建我们的GitHub API接口的一个实例。
@@ -60,5 +67,16 @@ public class RetrfitTest {
                 @Path("owner") String owner,
                 @Path("repo") String repo);
     }
+
+    private static OkHttpClient httpClient = new OkHttpClient.Builder()
+            .addInterceptor(new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
+                @Override
+                public void log(String message) {
+                    System.out.println(message);
+                }
+            }).setLevel(HttpLoggingInterceptor.Level.BASIC))
+            .connectTimeout(TIMEOUT, TimeUnit.SECONDS)
+            .readTimeout(TIMEOUT, TimeUnit.SECONDS)
+            .build();
 
 }
